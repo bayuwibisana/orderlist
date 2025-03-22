@@ -26,11 +26,11 @@ class AuthController extends Controller
 
             // Buat token baru
             $token = $user->createToken('auth_token')->plainTextToken;
-
+            $onlyToken = explode('|', $token)[1];
             // Response JSON
             return response()->json([
                 'message' => 'Login successful',
-                'token' => $token,
+                'token' => $onlyToken,
                 'user' => $user,
             ]);
         }
@@ -62,4 +62,15 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function me(Request $request)
+    {
+            $user = Auth::user();
+            return response()->json([
+                'message' => 'My data',
+                'token' => $request->user()->currentAccessToken()->token,
+                'user' => $user,
+            ]);
+    }
+    
 }
