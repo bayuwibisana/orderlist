@@ -72,5 +72,31 @@ class AuthController extends Controller
                 'user' => $user,
             ]);
     }
-    
+    public function register(Request $request)
+    {
+        // Validasi input
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
+
+        // Buat pengguna baru
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']),
+        ]);
+
+        // Buat token untuk pengguna baru
+        $token = $user->createToken('auth_token')->plainTextToken;
+        $onlyToken = explode('|', $token)[1];
+
+        // Response JSON
+        return response()->json([
+            'message' => 'Registration successful',
+            'token' => $onlyToken,
+            'user' => $user,
+        ]);
+    }
 }
